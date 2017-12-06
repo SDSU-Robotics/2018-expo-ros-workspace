@@ -203,7 +203,7 @@ set(CMAKE_CXX_FLAGS "-Wall -pthread -lpigpiod_if2 -lrt")
 add_executable(sensor_input src/sensor_input.cpp src/sensors.cpp src/mcp3008Spi.cpp)
 target_link_libraries(sensor_input ${catkin_LIBRARIES})
 
-add_executable(motor_control src/motor_control.cpp)
+add_executable(motor_control src/motor_control.cpp src/pid.cpp)
 target_link_libraries(motor_control ${catkin_LIBRARIES})
 
 add_executable(data_viewer src/data_viewer.cpp)

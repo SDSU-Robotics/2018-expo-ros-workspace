@@ -6,7 +6,6 @@
 
 #include "std_msgs/UInt16MultiArray.h"
 
-#include <pigpiod_if2.h>
 #include "mcp3008Spi.h"
 #include "sensors.h"
 

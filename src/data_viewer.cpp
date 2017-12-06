@@ -4,31 +4,31 @@
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
 
-#include "std_msgs/UInt16.h" // left_speed, right_speed
+#include "std_msgs/Float32.h" // left_speed, right_speed
 #include "std_msgs/UInt16MultiArray.h" // IR_raw, US_raw
 
 class Listener
 {
 public:
-	void setLeftSpeed(const std_msgs::UInt16 msg);
-	void setRightSpeed(const std_msgs::UInt16 msg);
+	void setLeftSpeed(const std_msgs::Float32 msg);
+	void setRightSpeed(const std_msgs::Float32 msg);
 	void setIRdata(const std_msgs::UInt16MultiArray msg);
 	void setUSdata(const std_msgs::UInt16MultiArray msg);
 	void printData();
 	
 private:
-	unsigned int leftSpeed;
-	unsigned int rightSpeed;
+	double leftSpeed;
+	double rightSpeed;
 	unsigned int IRdata[8];
 	unsigned int USdata[8];
 };
 
-void Listener::setLeftSpeed(const std_msgs::UInt16 msg)
+void Listener::setLeftSpeed(const std_msgs::Float32 msg)
 {
 	leftSpeed = msg.data;
 }
 
-void Listener::setRightSpeed(const std_msgs::UInt16 msg)
+void Listener::setRightSpeed(const std_msgs::Float32 msg)
 {
 	rightSpeed = msg.data;
 }
