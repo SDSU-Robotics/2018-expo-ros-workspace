@@ -5,7 +5,7 @@
 class ADCsensor
 {
 public:
-	ADCsensor(mcp3008Spi* adc, int channel);
+	void init(mcp3008Spi* adc, int channel);
 	double getValue();
 	
 private:

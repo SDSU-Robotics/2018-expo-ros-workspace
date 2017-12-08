@@ -26,7 +26,7 @@ class PIDImpl
 };
 
 
-PID::PID( double dt, double max, double min, double Kp, double Kd, double Ki )
+void PID::init( double dt, double max, double min, double Kp, double Kd, double Ki )
 {
     pimpl = new PIDImpl(dt,max,min,Kp,Kd,Ki);
 }

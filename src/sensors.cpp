@@ -1,9 +1,9 @@
 #include "sensors.h"
 
-ADCsensor::ADCsensor(mcp3008Spi* adc, int channel)
+void ADCsensor::init(mcp3008Spi* adc, int channel)
 {
-	ADCsensor::adc_ = adc;
-	ADCsensor::channel_ = channel;
+	adc_ = adc;
+	channel_ = channel;
 }
 
 double ADCsensor::getValue()

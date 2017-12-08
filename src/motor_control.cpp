@@ -1,7 +1,7 @@
 #include "ros/ros.h"
 #include <pigpiod_if2.h>
 #include <sstream>
-#include <pid.h>
+#include "pid.h"
 
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
@@ -33,9 +33,9 @@ const double KI = 0.5; // integral gain
 class Motor
 {
 public:
-	Motor(int pi, int pin);
+	void init(int pi, int pin);
 	void update(double encoderCount);
-	void setSetpoint(double setPoint);
+	void setSetpoint(double setPoint) { _setPoint = setPoint; }
 	
 private:
 	PID _pid;
@@ -44,27 +44,27 @@ private:
 	int _pin;
 	int _setPoint; // desired rev/s
 	int _lastCount;
-}
+};
 
-Motor::Motor(int pi, int pin)
+void Motor::init(int pi, int pin)
 {
 	_pi = pi;
 	
-	_pid = new PID(DT, MAX, MIN, KP, KD, KI);
+	_pid.init(DT, MAX, MIN, KP, KD, KI);
 	
 	_pin = pin;
 	_setPoint = 0;
 	_lastCount = 0;
 }
 
-Motor::update(double encoderCount);
+void Motor::update(double encoderCount)
 {
 	int dif = encoderCount - _lastCount;
 	int pv = dif / COUNTS_PER_REV / DT; // current rev/s
 	
 	_lastCount = encoderCount;
 	
-	set_PWM_dutycycle(pi, _pin, _pid.calculate(_setPoint, pv));
+	set_PWM_dutycycle(_pi, _pin, _pid.calculate(_setPoint, pv));
 }
 
 class Listener
@@ -80,22 +80,22 @@ private:
 	Motor motors[MOTOR_QUANTITY];
 };
 
-Lister::Listener(int pi)
+Listener::Listener(int pi)
 {
 	// initialize motors
 	for (int i = 0; i < MOTOR_QUANTITY; ++i)
 	{
-		motors[i] = new Motor(pi, MOTOR_PINS[i]);
+		motors[i].init(pi, MOTOR_PINS[i]);
 	}
 }
 
-void Listener::setLspeed(const std_msgs::Int16 msg)
+void Listener::setLspeed(const std_msgs::Float32 msg)
 {
 	motors[0].setSetpoint(msg.data);
 	motors[2].setSetpoint(msg.data);
 }
 
-void Listener::setRspeed(const std_msgs::Int16 msg)
+void Listener::setRspeed(const std_msgs::Float32 msg)
 {
 	motors[1].setSetpoint(msg.data);
 	motors[3].setSetpoint(msg.data);

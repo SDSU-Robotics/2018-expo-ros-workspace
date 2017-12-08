@@ -25,14 +25,17 @@ int main (int argc, char **argv)
 	mcp3008Spi adc0("/dev/spidev0.0", SPI_MODE_0, 1000000, 8);
 	mcp3008Spi adc1("/dev/spidev0.1", SPI_MODE_0, 1000000, 8);
 	
-	ADCsensor ir0(&adc0, 0);
+	ADCsensor IRsensors[8];
+	for (int i = 0; i < 8; i++)
+		IRsensors[i].init(&adc0, i);
 	
 	std_msgs::UInt16MultiArray IRmsg;
 	IRmsg.data.resize(8);
 	
 	while (ros::ok())
 	{
-		IRmsg.data[0] = ir0.getValue();
+		for (int i = 0; i < 8; i++)
+			IRmsg.data[i] = IRsensors[i].getValue();
 		
 		IR_raw_pub.publish(IRmsg);
 		
