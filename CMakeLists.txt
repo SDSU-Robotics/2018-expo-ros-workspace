@@ -200,7 +200,7 @@ include_directories(
 
 set(CMAKE_CXX_FLAGS "-Wall -pthread -lpigpiod_if2 -lrt")
 
-add_executable(sensor_input src/sensor_input.cpp src/sensors.cpp src/mcp3008Spi.cpp)
+add_executable(sensor_input src/sensor_input.cpp src/sensors.cpp src/mcp3008Spi.cpp src/dn2DistIR.c)
 target_link_libraries(sensor_input ${catkin_LIBRARIES})
 
 add_executable(motor_control src/motor_control.cpp src/pid.cpp)
