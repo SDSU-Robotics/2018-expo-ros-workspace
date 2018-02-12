@@ -5,14 +5,15 @@
 #include "std_msgs/MultiArrayDimension.h"
 
 #include "std_msgs/Float32.h" // left_speed, right_speed
-#include "std_msgs/UInt16MultiArray.h" // IR_raw, US_raw
+#include "std_msgs/UInt16MultiArray.h" // US_raw
+#include "std_msgs/Float32MultiArray.h" // IR_raw
 
 class Listener
 {
 public:
 	void setLeftSpeed(const std_msgs::Float32 msg);
 	void setRightSpeed(const std_msgs::Float32 msg);
-	void setIRdata(const std_msgs::UInt16MultiArray msg);
+	void setIRdata(const std_msgs::Float32MultiArray msg);
 	void setUSdata(const std_msgs::UInt16MultiArray msg);
 	void printData();
 	
@@ -33,7 +34,7 @@ void Listener::setRightSpeed(const std_msgs::Float32 msg)
 	rightSpeed = msg.data;
 }
 
-void Listener::setIRdata(const std_msgs::UInt16MultiArray msg)
+void Listener::setIRdata(const std_msgs::Float32MultiArray msg)
 {
 	for (int i = 0; i < 8; i++)
 		IRdata[i] = msg.data[i];
