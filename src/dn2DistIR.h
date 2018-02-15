@@ -1,3 +1,3 @@
 #pragma once
 
-float dn2DistIR( uint16_t dnVal );
+float dn2DistIR( int dnVal );

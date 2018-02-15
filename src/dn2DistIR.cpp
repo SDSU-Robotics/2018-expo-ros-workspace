@@ -148,7 +148,7 @@ const float dn2Dist[] = { 648.740000,637.058527,625.602600,614.367823,603.349883
 4.262350,4.251308,4.240294,4.229309,4.218353,4.207424,4.196525,4.185653,
 4.174809,4.163994,4.153206,4.142447,4.131715,4.121012,4.110336,4.099687 };
 
-float dn2DistIR( uint16_t dnVal ) {
+float dn2DistIR( int dnVal ) {
   float distance;
   distance = dn2Dist[dnVal];
   if (distance < MIN_DIST) distance = MIN_DIST;
