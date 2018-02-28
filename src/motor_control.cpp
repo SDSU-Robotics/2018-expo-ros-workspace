@@ -10,15 +10,17 @@
 #include "std_msgs/Int16MultiArray.h" // encoder_count
 
 
-/* Motor labelling convention:
+/* Motor labeling convention:
 	Front
 	0	1
 
 	2	3
+	
+	4	5
 */
 	
-const int MOTOR_QUANTITY = 4;
-const int MOTOR_PINS[MOTOR_QUANTITY] = { 23, 24, 25, 26 };
+const int MOTOR_QUANTITY = 6;
+const int MOTOR_PINS[MOTOR_QUANTITY] = { 22, 23, 24, 25, 26, 27 };
 
 const int COUNTS_PER_REV = 1440; // encoder counts per revolution
 
@@ -93,12 +95,14 @@ void Listener::setLspeed(const std_msgs::Float32 msg)
 {
 	motors[0].setSetpoint(msg.data);
 	motors[2].setSetpoint(msg.data);
+	motors[4].setSetpoint(msg.data);
 }
 
 void Listener::setRspeed(const std_msgs::Float32 msg)
 {
 	motors[1].setSetpoint(msg.data);
 	motors[3].setSetpoint(msg.data);
+	motors[5].setSetpoint(msg.data);
 }
 
 void Listener::updateEncoders(const std_msgs::Int16MultiArray msg)
