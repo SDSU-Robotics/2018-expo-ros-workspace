@@ -7,6 +7,7 @@
 #include "std_msgs/Float32.h" // left_speed, right_speed
 #include "std_msgs/UInt16MultiArray.h" // US_raw
 #include "std_msgs/Float32MultiArray.h" // IR_raw
+#include "std_msgs/Int32MultiArray.h" // encoder_raw
 
 class Listener
 {
@@ -15,6 +16,7 @@ public:
 	void setRightSpeed(const std_msgs::Float32 msg);
 	void setIRdata(const std_msgs::Float32MultiArray msg);
 	void setUSdata(const std_msgs::UInt16MultiArray msg);
+	void setEncoderData(const std_msgs::Int32MultiArray msg);
 	void printData();
 	
 private:
@@ -22,6 +24,7 @@ private:
 	double rightSpeed;
 	unsigned int IRdata[8];
 	unsigned int USdata[8];
+	int encoderData[6];
 };
 
 void Listener::setLeftSpeed(const std_msgs::Float32 msg)
@@ -46,6 +49,12 @@ void Listener::setUSdata(const std_msgs::UInt16MultiArray msg)
 		USdata[i] = msg.data[i];
 }
 
+void Listener::setEncoderData(const std_msgs::Int32MultiArray msg)
+{
+	for (int i = 0; i < 6; i++)
+		encoderData[i] = msg.data[i];
+}
+
 void Listener::printData()
 {
 	system("clear");
@@ -59,6 +68,11 @@ void Listener::printData()
 	
 	for (int i = 0; i < 8; i++)
 		std::cout << "US" << i << ": " << USdata[i] << std::endl;
+	
+	std::cout << std::endl;
+	
+	for (int i = 0; i < 6; i++)
+		std::cout << "Encoder" << i << ": " << encoderData[i] << std::endl;
 }
 
 int main (int argc, char **argv)
@@ -74,6 +88,7 @@ int main (int argc, char **argv)
 	ros::Subscriber rightSub = n.subscribe("right_speed", 1000, &Listener::setRightSpeed, &listener);
 	ros::Subscriber IRSub = n.subscribe("IR_raw", 1000, &Listener::setIRdata, &listener);
 	ros::Subscriber USSub = n.subscribe("US_raw", 1000, &Listener::setUSdata, &listener);
+	ros::Subscriber encoderSub = n.subscribe("encoder_raw", 1000, &Listener::setEncoderData, &listener);
 	
 	while (ros::ok())
 	{
