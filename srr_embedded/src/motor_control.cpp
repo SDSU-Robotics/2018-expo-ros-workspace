@@ -37,7 +37,7 @@ class Motor
 public:
 	void init(int pi, int pin);
 	void update(double encoderCount);
-	void setSetpoint(double setPoint) { _setPoint = setPoint; }
+	void setSetpoint(double setPoint) { /*_setPoint = setPoint;*/ set_PWM_dutycycle(_pi, _pin, setPoint); } // testing drivers
 	
 private:
 	PID _pid;
