@@ -23,23 +23,3 @@ unsigned int ADCsensor::getValue()
 	
 	return adcVal;
 }
-
-void Encoder::init(int pi, int address)
-{
-	fd_ = i2c_open(pi, 1, address, 0);
-	pi_ = pi;
-}
-
-int Encoder::getCount()
-{
-	char data[4];
-	i2c_read_i2c_block_data(pi_, fd_, 0, data, 4);
-	
-	int result = 0;
-	result |= (data[0] << 24) & 0xFFFFFFFF;
-	result |= (data[1] << 16) & 0xFFFFFFFF;
-	result |= (data[2] << 8) & 0xFFFFFFFF;
-	result |= data[3] & 0xFFFFFFFF;
-		
-	return result;
-}
