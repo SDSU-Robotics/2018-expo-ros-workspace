@@ -17,7 +17,7 @@
 const int NUM_IR = 8; // number of IR sensors
 const int NUM_ENC = 6; // number of encoders
 
-const int ENC_ADR[] = { 40, 41, 42, 43, 44, 45 }; // address of encoder counters
+const int ENCODER_ADDRESS = 40; // address of encoder counter
 
 int main (int argc, char **argv)
 {
@@ -49,23 +49,33 @@ int main (int argc, char **argv)
 	// Encoder setup
 	ros::Publisher encoder_raw_pub = n.advertise<std_msgs::Int32MultiArray>("encoder_raw", 1000);
 	
-	Encoder encoders[NUM_ENC];
-	for (int i = 0; i < NUM_ENC; i++)
-		encoders[i].init(pi, ENC_ADR[i]);
+	int encoderI2C = i2c_open(pi, 1, ENCODER_ADDRESS, 0); // opens i2c device at address 40
 	
 	std_msgs::Int32MultiArray encoderMsg;
 	encoderMsg.data.resize(NUM_ENC);
 	
 	while (ros::ok())
 	{
+		// read IR sensors
 		for (int i = 0; i < NUM_IR; i++)
 			IRmsg.data[i] = dn2DistIR(IRsensors[i].getValue());
-		
 		IR_raw_pub.publish(IRmsg);
 		
-		for (int i = 0; i < 6; i++)
-			encoderMsg.data[i] = encoders[i].getCount();
+		
+		// read encoders
+		char data[24];
+		i2c_read_i2c_block_data(pi, encoderI2C, 0, data, 4 * NUM_ENC);
+		
+		for (int i = 0; i < NUM_ENC; i++)
+		{
+			encoderMsg.data[i] = 0;
+			encoderMsg.data[i] |= (data[4*i] << 24) & 0xFFFFFFFF;
+			encoderMsg.data[i] |= (data[4*i + 1] << 16) & 0xFFFFFFFF;
+			encoderMsg.data[i] |= (data[4*i + 2] << 8) & 0xFFFFFFFF;
+			encoderMsg.data[i] |= data[4*i + 3] & 0xFFFFFFFF;
+		}
 		encoder_raw_pub.publish(encoderMsg);
+		
 		
 		loop_rate.sleep();
 	}
