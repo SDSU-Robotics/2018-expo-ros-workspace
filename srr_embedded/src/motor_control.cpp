@@ -78,12 +78,12 @@ int main (int argc, char **argv)
 	
 	Listener listener(pi);
 	
-	ros::Subscriber M0Sub = n.subscribe("m0_control_effort", 1000, &Listener::setM0speed, &listener);
-	ros::Subscriber M1Sub = n.subscribe("m1_control_effort", 1000, &Listener::setM1speed, &listener);
-	ros::Subscriber M2Sub = n.subscribe("m2_control_effort", 1000, &Listener::setM2speed, &listener);
-	ros::Subscriber M3Sub = n.subscribe("m3_control_effort", 1000, &Listener::setM3speed, &listener);
-	ros::Subscriber M4Sub = n.subscribe("m4_control_effort", 1000, &Listener::setM4speed, &listener);
-	ros::Subscriber M5Sub = n.subscribe("m5_control_effort", 1000, &Listener::setM5speed, &listener);
+	ros::Subscriber M0Sub = n.subscribe("m0_speed_control_effort", 1000, &Listener::setM0speed, &listener);
+	ros::Subscriber M1Sub = n.subscribe("m1_speed_control_effort", 1000, &Listener::setM1speed, &listener);
+	ros::Subscriber M2Sub = n.subscribe("m2_speed_control_effort", 1000, &Listener::setM2speed, &listener);
+	ros::Subscriber M3Sub = n.subscribe("m3_speed_control_effort", 1000, &Listener::setM3speed, &listener);
+	ros::Subscriber M4Sub = n.subscribe("m4_speed_control_effort", 1000, &Listener::setM4speed, &listener);
+	ros::Subscriber M5Sub = n.subscribe("m5_speed_control_effort", 1000, &Listener::setM5speed, &listener);
 	
 	ros::spin();
 	
