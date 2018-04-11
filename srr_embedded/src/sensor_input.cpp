@@ -1,11 +1,12 @@
 #include "ros/ros.h"
-#include "std_msgs/Int16.h"
 
 #include "std_msgs/MultiArrayLayout.h"
 #include "std_msgs/MultiArrayDimension.h"
 
 #include "std_msgs/Float32MultiArray.h" // ir_raw
 #include "std_msgs/Int32MultiArray.h" // encoder_raw
+
+#include "std_msgs/Float64.h" // control_effort
 
 #include "mcp3008Spi.h"
 #include "sensors.h"
@@ -19,13 +20,20 @@ const int NUM_ENC = 6; // number of encoders
 
 const int ENCODER_ADDRESS = 40; // address of encoder counter
 
+const int LOOP_FREQUENCY = 10; // Hz
+
+const float WHEEL_DIAMETER = 5; // diameter in cm
+const int COUNTS_PER_REVOLUTION = 1440; // encoder counts per revolution
+
+const double PI = 3.14159265;
+
 int main (int argc, char **argv)
 {
 	ros::init(argc, argv, "sensor_input");
 	
 	ros::NodeHandle n;
 	
-	ros::Rate loop_rate(100);
+	ros::Rate loop_rate(LOOP_FREQUENCY);
 
 	// initialize pigpio
 	int pi = pigpio_start(NULL, NULL);	
@@ -48,11 +56,22 @@ int main (int argc, char **argv)
 	
 	// Encoder setup
 	ros::Publisher encoder_raw_pub = n.advertise<std_msgs::Int32MultiArray>("encoder_raw", 1000);
+	ros::Publisher m0_rate_pub = n.advertise<std_msgs::Float64>("m0_rate", 1000);
+	ros::Publisher m1_rate_pub = n.advertise<std_msgs::Float64>("m1_rate", 1000);
+	ros::Publisher m2_rate_pub = n.advertise<std_msgs::Float64>("m2_rate", 1000);
+	ros::Publisher m3_rate_pub = n.advertise<std_msgs::Float64>("m3_rate", 1000);
+	ros::Publisher m4_rate_pub = n.advertise<std_msgs::Float64>("m4_rate", 1000);
+	ros::Publisher m5_rate_pub = n.advertise<std_msgs::Float64>("m5_rate", 1000);
 	
 	int encoderI2C = i2c_open(pi, 1, ENCODER_ADDRESS, 0); // opens i2c device at address 40
 	
+	int currentCounts[NUM_ENC] = { 0 };
+	int lastCounts[NUM_ENC] = { 0 };
+	
 	std_msgs::Int32MultiArray encoderMsg;
 	encoderMsg.data.resize(NUM_ENC);
+	
+	std_msgs::Float64 rateMsg[NUM_ENC];
 	
 	while (ros::ok())
 	{
@@ -68,13 +87,26 @@ int main (int argc, char **argv)
 		
 		for (int i = 0; i < NUM_ENC; i++)
 		{
-			encoderMsg.data[i] = 0;
-			encoderMsg.data[i] |= (data[4*i] << 24) & 0xFFFFFFFF;
-			encoderMsg.data[i] |= (data[4*i + 1] << 16) & 0xFFFFFFFF;
-			encoderMsg.data[i] |= (data[4*i + 2] << 8) & 0xFFFFFFFF;
-			encoderMsg.data[i] |= data[4*i + 3] & 0xFFFFFFFF;
+			lastCounts[i] = currentCounts[i];
+			
+			currentCounts[i] = 0;
+			currentCounts[i] |= (data[4*i] << 24) & 0xFFFFFFFF;
+			currentCounts[i] |= (data[4*i + 1] << 16) & 0xFFFFFFFF;
+			currentCounts[i] |= (data[4*i + 2] << 8) & 0xFFFFFFFF;
+			currentCounts[i] |= data[4*i + 3] & 0xFFFFFFFF;
+			
+			encoderMsg.data[i] = currentCounts[i];
+			
+			rateMsg[i].data = (currentCounts[i] - lastCounts[i]) / COUNTS_PER_REVOLUTION * LOOP_FREQUENCY * PI * WHEEL_DIAMETER / 100;
 		}
+		
 		encoder_raw_pub.publish(encoderMsg);
+		m0_rate_pub.publish(rateMsg[0]);
+		m1_rate_pub.publish(rateMsg[1]);
+		m2_rate_pub.publish(rateMsg[2]);
+		m3_rate_pub.publish(rateMsg[3]);
+		m4_rate_pub.publish(rateMsg[4]);
+		m5_rate_pub.publish(rateMsg[5]);
 		
 		
 		loop_rate.sleep();
