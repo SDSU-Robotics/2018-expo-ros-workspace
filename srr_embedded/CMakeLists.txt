@@ -10,8 +10,9 @@ project(srr_embedded)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
-  std_msgs
-)
+  std_msgs  
+  sensor_msgs
+ )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -106,6 +107,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES srr_embedded
 #  CATKIN_DEPENDS roscpp rospy std_msgs
+#  CATKIN_DEPENDS sensor_msgs
 #  DEPENDS system_lib
 )
 
@@ -208,3 +210,6 @@ target_link_libraries(motor_control ${catkin_LIBRARIES})
 
 add_executable(data_viewer src/data_viewer.cpp)
 target_link_libraries(data_viewer ${catkin_LIBRARIES})
+
+add_executable(teleop src/teleop.cpp)
+target_link_libraries(teleop ${catkin_LIBRARIES})
