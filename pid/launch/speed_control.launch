@@ -1,0 +1,16 @@
+<launch>
+    <node name="m0_speed_control" pkg="pid" type="controller" output="screen" >
+      <param name="Kp" value="0.1" />
+      <param name="Ki" value="0.1" />
+      <param name="Kd" value="0.0" />
+      <param name="upper_limit" value="1" />
+      <param name="lower_limit" value="-1" />
+      <param name="windup_limit" value="100" />
+      <param name="cutoff_frequency" value="20" />
+      <param name="max_loop_frequency" value="100.0" />
+      <param name="min_loop_frequency" value="100.0" />
+      <param name="topic_from_controller" value="m0_speed_control_effort" />
+      <param name="topic_from_plant" value="m0_rate" />
+      <param name="setpoint_topic" value="m0_speed_setpoint" />
+     </node>
+</launch>
