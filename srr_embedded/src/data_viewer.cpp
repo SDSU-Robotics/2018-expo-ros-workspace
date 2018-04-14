@@ -17,6 +17,7 @@ public:
 	void setIRdata(const std_msgs::Float32MultiArray msg);
 	void setUSdata(const std_msgs::UInt16MultiArray msg);
 	void setEncoderData(const std_msgs::Int32MultiArray msg);
+	void setIMUdata(const std_msgs::Float32MultiArray msg);
 	void printData();
 	
 private:
@@ -25,6 +26,7 @@ private:
 	unsigned int IRdata[8];
 	unsigned int USdata[8];
 	int encoderData[6];
+	double IMUdata[9];
 };
 
 void Listener::setLeftSpeed(const std_msgs::Float32 msg)
@@ -55,6 +57,12 @@ void Listener::setEncoderData(const std_msgs::Int32MultiArray msg)
 		encoderData[i] = msg.data[i];
 }
 
+void Listener::setIMUdata(const std_msgs::Float32MultiArray msg)
+{
+	for (int i = 0; i < 10; i++)
+		IMUdata[i] = msg.data[i];
+}
+
 void Listener::printData()
 {
 	system("clear");
@@ -73,6 +81,18 @@ void Listener::printData()
 	
 	for (int i = 0; i < 6; i++)
 		std::cout << "Encoder" << i << ": " << encoderData[i] << std::endl;
+	
+	std::cout << std::endl;
+	
+	std::cout << "IMU Ax: " << IMUdata[0] << std::endl;
+	std::cout << "IMU Ay: " << IMUdata[1] << std::endl;
+	std::cout << "IMU Az: " << IMUdata[2] << std::endl;
+	std::cout << "IMU Gx: " << IMUdata[3] << std::endl;
+	std::cout << "IMU Gy: " << IMUdata[4] << std::endl;
+	std::cout << "IMU Gz: " << IMUdata[5] << std::endl;
+	std::cout << "IMU Hx: " << IMUdata[6] << std::endl;
+	std::cout << "IMU Hy: " << IMUdata[7] << std::endl;
+	std::cout << "IMU Hz:  " << IMUdata[8] << std::endl;
 }
 
 int main (int argc, char **argv)
@@ -89,7 +109,8 @@ int main (int argc, char **argv)
 	ros::Subscriber IRSub = n.subscribe("IR_raw", 1000, &Listener::setIRdata, &listener);
 	ros::Subscriber USSub = n.subscribe("US_raw", 1000, &Listener::setUSdata, &listener);
 	ros::Subscriber encoderSub = n.subscribe("encoder_raw", 1000, &Listener::setEncoderData, &listener);
-	
+	ros::Subscriber IMUSub = n.subscribe("IMU_raw", 1000, &Listener::setIMUdata, &listener);
+
 	while (ros::ok())
 	{
 		ros::spinOnce();
