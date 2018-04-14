@@ -36,7 +36,7 @@ void Motor::init(int pi, int pin)
 
 void Motor::setSpeed(double speed) // speed -100 to +100
 {
-	set_PWM_dutycycle(_pi, _pin, (speed + 100) * 255 / 200);
+	set_PWM_dutycycle(_pi, _pin, (speed + 1) * 255 / 2);
 }
 
 class Listener
