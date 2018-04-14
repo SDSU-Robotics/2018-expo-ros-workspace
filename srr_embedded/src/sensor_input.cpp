@@ -20,9 +20,9 @@ const int NUM_ENC = 6; // number of encoders
 
 const int ENCODER_ADDRESS = 40; // address of encoder counter
 
-const int LOOP_FREQUENCY = 10; // Hz
+const float LOOP_FREQUENCY = 300.0; // Hz
 
-const float WHEEL_DIAMETER = 5; // diameter in cm
+const float WHEEL_DIAMETER = 8.0; // diameter in cm
 const int COUNTS_PER_REVOLUTION = 1440; // encoder counts per revolution
 
 const double PI = 3.14159265;
@@ -62,7 +62,7 @@ int main (int argc, char **argv)
 	ros::Publisher m3_rate_pub = n.advertise<std_msgs::Float64>("m3_rate", 1000);
 	ros::Publisher m4_rate_pub = n.advertise<std_msgs::Float64>("m4_rate", 1000);
 	ros::Publisher m5_rate_pub = n.advertise<std_msgs::Float64>("m5_rate", 1000);
-	
+
 	int encoderI2C = i2c_open(pi, 1, ENCODER_ADDRESS, 0); // opens i2c device at address 40
 	
 	int currentCounts[NUM_ENC] = { 0 };
@@ -97,7 +97,9 @@ int main (int argc, char **argv)
 			
 			encoderMsg.data[i] = currentCounts[i];
 			
-			rateMsg[i].data = (currentCounts[i] - lastCounts[i]) / COUNTS_PER_REVOLUTION * LOOP_FREQUENCY * PI * WHEEL_DIAMETER / 100;
+			double rate = (currentCounts[i] - lastCounts[i]) / static_cast<double>(COUNTS_PER_REVOLUTION) * LOOP_FREQUENCY * PI * WHEEL_DIAMETER / 100.0;
+			if (rate < 10.0 && rate > -10.0)			
+				rateMsg[i].data = rate;
 		}
 		
 		encoder_raw_pub.publish(encoderMsg);
@@ -107,8 +109,7 @@ int main (int argc, char **argv)
 		m3_rate_pub.publish(rateMsg[3]);
 		m4_rate_pub.publish(rateMsg[4]);
 		m5_rate_pub.publish(rateMsg[5]);
-		
-		
+
 		loop_rate.sleep();
 	}
 	
