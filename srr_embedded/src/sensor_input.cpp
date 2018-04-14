@@ -12,6 +12,9 @@
 #include "sensors.h"
 #include "dn2DistIR.h"
 
+#include "MPU9250.h"
+#include <wiringPi.h>
+
 #include <sstream>
 #include <pigpiod_if2.h>
 
@@ -29,6 +32,11 @@ const double PI = 3.14159265;
 
 int main (int argc, char **argv)
 {
+	float ax, ay, az, gx, gy, gz, hx, hy, hz, t;
+		
+	int beginStatus;
+	MPU9250 IMU(0x68);
+	
 	ros::init(argc, argv, "sensor_input");
 	
 	ros::NodeHandle n;
@@ -43,6 +51,20 @@ int main (int argc, char **argv)
 	// create mcp3008Spi objects
 	mcp3008Spi adc0("/dev/spidev0.0", SPI_MODE_0, 1000000, 8);
 	mcp3008Spi adc1("/dev/spidev0.1", SPI_MODE_0, 1000000, 8);
+	
+	
+	// Initialize IMU communication
+	beginStatus = IMU.begin(ACCEL_RANGE_4G,GYRO_RANGE_250DPS);
+
+ 	if(beginStatus < 0) {
+		delay(1000);
+		fprintf(stderr, "IMU initialization unsuccessful\n");
+		fprintf(stderr, "Check IMU wiring or try cycling power \n");
+		delay(10000);
+	}
+	ros::Publisher IMU_raw_pub = n.advertise<std_msgs::Float32MultiArray>("IMU_raw", 1000);
+	std_msgs::Float32MultiArray IMUmsg;
+	IMUmsg.data.resize(9);
 	
 	// IR sensor setup
 	ros::Publisher IR_raw_pub = n.advertise<std_msgs::Float32MultiArray>("IR_raw", 1000);
@@ -79,6 +101,23 @@ int main (int argc, char **argv)
 		for (int i = 0; i < NUM_IR; i++)
 			IRmsg.data[i] = dn2DistIR(IRsensors[i].getValue());
 		IR_raw_pub.publish(IRmsg);
+		
+		//read IMU
+		IMU.getMotion10(&ax, &ay, &az, &gx, &gy, &gz, &hx, &hy, &hz, &t);
+		
+		// Assign values to arrays to make life easier
+		IMUmsg.data[0] = ax;
+		IMUmsg.data[1] = ay;
+		IMUmsg.data[2] = az;
+		IMUmsg.data[3] = gx;
+		IMUmsg.data[4] = gy;
+		IMUmsg.data[5] = gz;
+		IMUmsg.data[6] = hx;
+		IMUmsg.data[7] = hy;
+		IMUmsg.data[8] = hz;
+		IMUmsg.data[9] = t;
+		
+ 		IMU_raw_pub.publish(IMUmsg);
 		
 		
 		// read encoders

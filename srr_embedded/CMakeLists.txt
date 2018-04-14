@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(srr_embedded)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+ add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -200,8 +200,8 @@ include_directories(
 
 set(CMAKE_CXX_FLAGS "-Wall -pthread -lpigpiod_if2 -lrt")
 
-add_executable(sensor_input src/sensor_input.cpp src/sensors.cpp src/mcp3008Spi.cpp src/dn2DistIR.cpp)
-target_link_libraries(sensor_input ${catkin_LIBRARIES})
+add_executable(sensor_input src/sensor_input.cpp src/sensors.cpp src/mcp3008Spi.cpp src/dn2DistIR.cpp src/MPU9250.cpp)
+target_link_libraries(sensor_input ${catkin_LIBRARIES} wiringPi)
 
 add_executable(motor_control src/motor_control.cpp)
 target_link_libraries(motor_control ${catkin_LIBRARIES})
