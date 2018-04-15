@@ -1,6 +1,7 @@
 #include "ros/ros.h"
 #include <pigpiod_if2.h>
 #include <sstream>
+#include <cmath>
 
 #include "std_msgs/Float64.h" // left_speed, right_speed
 
@@ -13,30 +14,44 @@
 	
 	4	5
 */
-	
+
 const int MOTOR_QUANTITY = 6;
-const int MOTOR_PINS[MOTOR_QUANTITY] = { 22, 23, 24, 25, 26, 27 };
+const int PWM_PINS[MOTOR_QUANTITY] = { 26, 18, 20, 21, 22, 23 };
+const int DIR_PINS[MOTOR_QUANTITY]={ 5, 6, 16, 19, 12, 13 };
 
 class Motor
 {
 public:
-	void init(int pi, int pin);
+	void init(int pi, int pwm, int dir);
 	void setSpeed(double speed);
 	
 private:
-	int _pi;
-	int _pin;
+	int pi_;
+	int pwm_;
+	int dir_;
 };
 
-void Motor::init(int pi, int pin)
+void Motor::init(int pi, int pwm, int dir)
 {
-	_pi = pi;
-	_pin = pin;
+	pi_ = pi;
+	pwm_ = pwm;
+	dir_ = dir;
 }
 
-void Motor::setSpeed(double speed) // speed -100 to +100
+void Motor::setSpeed(double speed) // speed -1 to +1
 {
-	set_PWM_dutycycle(_pi, _pin, (speed + 1) * 255 / 2);
+	// set direction output
+	if (speed > 0)
+		gpio_write(pi_, dir_, 1);
+	else 
+	{
+		gpio_write(pi_, dir_, 0);
+		speed = -speed;
+	}
+
+	// set magnitude
+	set_PWM_dutycycle(pi_, pwm_, speed * 255.0);
+	 ROS_INFO("PWM Val: %lf\n",speed * 255.0);
 }
 
 class Listener
@@ -60,7 +75,7 @@ Listener::Listener(int pi)
 	// initialize motors
 	for (int i = 0; i < MOTOR_QUANTITY; ++i)
 	{
-		motors[i].init(pi, MOTOR_PINS[i]);
+		motors[i].init(pi, PWM_PINS[i], DIR_PINS[i]);
 	}
 }
 
