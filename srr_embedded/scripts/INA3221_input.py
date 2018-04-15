@@ -9,86 +9,78 @@
 # imports
 
 import sys
-import time
-import datetime
 import random 
 import SDL_Pi_INA3221
+from std_msgs.msg import Float64
+import rospy
 
 # Main Program
 
-print ""
-print "Test SDL_Pi_INA3221 Version 1.0 - SwitchDoc Labs"
-print ""
-print "Sample uses 0x40 and SunAirPlus board INA3221"
-print " Will work with the INA3221 SwitchDoc Labs Breakout Board"
-print "Program Started at:"+ time.strftime("%Y-%m-%d %H:%M:%S")
-print ""
+iSense0 = SDL_Pi_INA3221.SDL_Pi_INA3221(addr=0x40)
+iSense1 = SDL_Pi_INA3221.SDL_Pi_INA3221(addr=0x41)
 
-filename = time.strftime("%Y-%m-%d%H:%M:%SRTCTest") + ".txt"
-starttime = datetime.datetime.utcnow()
+def Listener():
 
-ina3221 = SDL_Pi_INA3221.SDL_Pi_INA3221(addr=0x40)
+	m0_pub  = rospy.Publisher('m0_current', Float64, queue_size=10)
+        m1_pub  = rospy.Publisher('m1_current', Float64, queue_size=10)
+        m2_pub  = rospy.Publisher('m2_current', Float64, queue_size=10)
+        m3_pub  = rospy.Publisher('m3_current', Float64, queue_size=10)
+        m4_pub  = rospy.Publisher('m4_current', Float64, queue_size=10)
+        m5_pub  = rospy.Publisher('m5_current', Float64, queue_size=10)
 
-# the three channels of the INA3221 named for SunAirPlus Solar Power Controller channels (www.switchdoc.com)
-LIPO_BATTERY_CHANNEL = 1
-SOLAR_CELL_CHANNEL   = 2
-OUTPUT_CHANNEL       = 3
+	rospy.init_node('Listener', anonymous=True) 
+	rate = rospy.Rate(10)
+	while not rospy.is_shutdown():
+
+				
+
+  			current_mA0 = 0
+  			current_mA0 = iSense0.getCurrent_mA(1)  
+			
+  			current_mA1 = 0
+  			current_mA1 = iSense0.getCurrent_mA(2)
+  			  		
+  			current_mA2 = 0
+			current_mA2 = iSense0.getCurrent_mA(3)
+  			
+			current_mA3 = 0
+                        current_mA3 = iSense1.getCurrent_mA(1)
+
+                        current_mA4 = 0
+                        current_mA4 = iSense1.getCurrent_mA(2)
+                                        
+                        current_mA5 = 0
+                        current_mA5 = iSense1.getCurrent_mA(3)
 
 
-while True:
-
-  	print "------------------------------"
-  	shuntvoltage1 = 0
-  	busvoltage1   = 0
-  	current_mA1   = 0
-  	loadvoltage1  = 0
-
-
-  	busvoltage1 = ina3221.getBusVoltage_V(LIPO_BATTERY_CHANNEL)
-  	shuntvoltage1 = ina3221.getShuntVoltage_mV(LIPO_BATTERY_CHANNEL)
-  	# minus is to get the "sense" right.   - means the battery is charging, + that it is discharging
-  	current_mA1 = ina3221.getCurrent_mA(LIPO_BATTERY_CHANNEL)  
-
-  	loadvoltage1 = busvoltage1 + (shuntvoltage1 / 1000)
-  
-  	print "LIPO_Battery Bus Voltage: %3.2f V " % busvoltage1
-  	print "LIPO_Battery Shunt Voltage: %3.2f mV " % shuntvoltage1
-  	print "LIPO_Battery Load Voltage:  %3.2f V" % loadvoltage1
-  	print "LIPO_Battery Current 1:  %3.2f mA" % current_mA1
-  	print
-
-  	shuntvoltage2 = 0
-  	busvoltage2 = 0
-  	current_mA2 = 0
-  	loadvoltage2 = 0
-
-  	busvoltage2 = ina3221.getBusVoltage_V(SOLAR_CELL_CHANNEL)
-  	shuntvoltage2 = ina3221.getShuntVoltage_mV(SOLAR_CELL_CHANNEL)
-  	current_mA2 = -ina3221.getCurrent_mA(SOLAR_CELL_CHANNEL)
-  	loadvoltage2 = busvoltage2 + (shuntvoltage2 / 1000)
-  
-  	print "Solar Cell Bus Voltage 2:  %3.2f V " % busvoltage2
-  	print "Solar Cell Shunt Voltage 2: %3.2f mV " % shuntvoltage2
-  	print "Solar Cell Load Voltage 2:  %3.2f V" % loadvoltage2
-  	print "Solar Cell Current 2:  %3.2f mA" % current_mA2
-  	print 
-
-  	shuntvoltage3 = 0
-  	busvoltage3 = 0
-  	current_mA3 = 0
-  	loadvoltage3 = 0
-
-  	busvoltage3 = ina3221.getBusVoltage_V(OUTPUT_CHANNEL)
-  	shuntvoltage3 = ina3221.getShuntVoltage_mV(OUTPUT_CHANNEL)
-  	current_mA3 = ina3221.getCurrent_mA(OUTPUT_CHANNEL)
-  	loadvoltage3 = busvoltage3 + (shuntvoltage3 / 1000)
-  
-  	print "Output Bus Voltage 3:  %3.2f V " % busvoltage3
-  	print "Output Shunt Voltage 3: %3.2f mV " % shuntvoltage3
-  	print "Output Load Voltage 3:  %3.2f V" % loadvoltage3
-  	print "Output Current 3:  %3.2f mA" % current_mA3
-  	print
+  			print
+			
+			rospy.loginfo(current_mA0)
+			m0_pub.publish(current_mA0)
 		
+			rospy.loginfo(current_mA1)
+			m1_pub.publish(current_mA1)
 
-	#
-	time.sleep(2.0)
+			rospy.loginfo(current_mA2)
+			m2_pub.publish(current_mA2)
+			
+			rospy.loginfo(current_mA3)
+                        m3_pub.publish(current_mA3)
+			
+			rospy.loginfo(current_mA4)
+                        m4_pub.publish(current_mA4)
+
+			rospy.loginfo(current_mA5)
+                        m5_pub.publish(current_mA5)
+
+
+
+		
+	
+	rate.sleep()
+
+if __name__ == '__main__':
+	try:
+		Listener()
+	except rospy.ROSInterruptException:
+		pass
