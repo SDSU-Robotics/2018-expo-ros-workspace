@@ -214,4 +214,9 @@ add_executable(data_viewer src/data_viewer.cpp)
 target_link_libraries(data_viewer ${catkin_LIBRARIES})
 
 add_executable(teleop src/teleop.cpp)
+<<<<<<< HEAD
 target_link_libraries(teleop ${catkin_LIBRARIES})
+=======
+add_dependencies(teleop ${catkin_EXPORTED_TARGETS})
+target_link_libraries(teleop ${catkin_LIBRARIES})
+>>>>>>> 1e871407a7ebd339e22ee3b8f0d9d83262327502
