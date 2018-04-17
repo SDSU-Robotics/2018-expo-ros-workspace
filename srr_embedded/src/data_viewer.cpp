@@ -8,6 +8,7 @@
 #include "std_msgs/UInt16MultiArray.h" // US_raw
 #include "std_msgs/Float32MultiArray.h" // IR_raw
 #include "std_msgs/Int32MultiArray.h" // encoder_raw
+#include "std_msgs/Float64.h" // Current Sensor
 
 class Listener
 {
@@ -18,6 +19,9 @@ public:
 	void setUSdata(const std_msgs::UInt16MultiArray msg);
 	void setEncoderData(const std_msgs::Int32MultiArray msg);
 	void setIMUdata(const std_msgs::Float32MultiArray msg);
+	void setM0Idata(const std_msgs::Float64 msg);
+	void setM1Idata(const std_msgs::Float64 msg);
+	void setM2Idata(const std_msgs::Float64 msg);
 	void printData();
 	
 private:
@@ -27,6 +31,9 @@ private:
 	unsigned int USdata[8];
 	int encoderData[6];
 	double IMUdata[9];
+	float m0_current;
+	float m1_current;
+	float m2_current;
 };
 
 void Listener::setLeftSpeed(const std_msgs::Float32 msg)
@@ -63,6 +70,23 @@ void Listener::setIMUdata(const std_msgs::Float32MultiArray msg)
 		IMUdata[i] = msg.data[i];
 }
 
+void Listener::setM0Idata(const std_msgs::Float64 msg)
+{
+	m0_current = msg.data;
+}
+
+void Listener::setM1Idata(const std_msgs::Float64 msg)
+{
+        m1_current = msg.data;
+}
+
+void Listener::setM2Idata(const std_msgs::Float64 msg)
+{
+        m2_current = msg.data;
+}
+
+
+
 void Listener::printData()
 {
 	system("clear");
@@ -93,6 +117,12 @@ void Listener::printData()
 	std::cout << "IMU Hx: " << IMUdata[6] << std::endl;
 	std::cout << "IMU Hy: " << IMUdata[7] << std::endl;
 	std::cout << "IMU Hz:  " << IMUdata[8] << std::endl;
+	
+	std::cout << std::endl;	
+
+	std::cout << "Current Sensor 1: " << m0_current << std::endl;
+	std::cout << "Current Sensor 2: " << m1_current << std::endl;
+	std::cout << "Current Sensor 3: " << m2_current << std::endl; 
 }
 
 int main (int argc, char **argv)
@@ -110,6 +140,9 @@ int main (int argc, char **argv)
 	ros::Subscriber USSub = n.subscribe("US_raw", 1000, &Listener::setUSdata, &listener);
 	ros::Subscriber encoderSub = n.subscribe("encoder_raw", 1000, &Listener::setEncoderData, &listener);
 	ros::Subscriber IMUSub = n.subscribe("IMU_raw", 1000, &Listener::setIMUdata, &listener);
+	ros::Subscriber m0ISub = n.subscribe("m0_current", 10, &Listener::setM0Idata, &listener);
+        ros::Subscriber m1ISub = n.subscribe("m1_current", 10, &Listener::setM1Idata, &listener);
+        ros::Subscriber m2ISub = n.subscribe("m2_current", 10, &Listener::setM2Idata, &listener);
 
 	while (ros::ok())
 	{
