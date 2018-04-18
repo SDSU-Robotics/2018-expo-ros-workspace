@@ -189,6 +189,7 @@ int main (int argc, char **argv)
             break;
 		} // switch(mode)
 
+		// publish motor setpoints
 		m0_pub.publish(mL_speed_setpoint_msg);
 		m2_pub.publish(mL_speed_setpoint_msg);
 		m4_pub.publish(mL_speed_setpoint_msg);
