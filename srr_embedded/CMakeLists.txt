@@ -202,17 +202,17 @@ include_directories(
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
 
-set(CMAKE_CXX_FLAGS "-Wall -pthread -lpigpiod_if2 -lrt")
+#set(CMAKE_CXX_FLAGS "-Wall -pthread -lpigpiod_if2 -lrt")
 
 add_executable(sensor_input src/sensor_input.cpp src/sensors.cpp src/mcp3008Spi.cpp src/dn2DistIR.cpp src/MPU9250.cpp)
-target_link_libraries(sensor_input ${catkin_LIBRARIES} wiringPi)
+target_link_libraries(sensor_input ${catkin_LIBRARIES} wiringPi pigpiod_if2)
 
 add_executable(motor_control src/motor_control.cpp)
-target_link_libraries(motor_control ${catkin_LIBRARIES})
+target_link_libraries(motor_control ${catkin_LIBRARIES} pigpiod_if2)
 
 add_executable(data_viewer src/data_viewer.cpp)
 target_link_libraries(data_viewer ${catkin_LIBRARIES})
 
 add_executable(teleop src/teleop.cpp)
-add_dependencies(teleop ${catkin_EXPORTED_TARGETS})
+#add_dependencies(teleop ${catkin_EXPORTED_TARGETS})
 target_link_libraries(teleop ${catkin_LIBRARIES})
